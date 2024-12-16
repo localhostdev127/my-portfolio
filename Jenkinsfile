@@ -84,7 +84,7 @@ pipeline {
             steps {
                 echo 'Deploying application...'
                 // Add your deployment steps here
-                                script {
+                    script {
                     def remote = [:]
                     withCredentials([
                         sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, 
@@ -103,6 +103,7 @@ pipeline {
                         
                         // SSH into the server and execute Docker commands
                         sshCommand remote: remote, command: '''
+                            mkdir hello
                             # Stop all running containers
                             docker ps -q | xargs -r docker stop
 
