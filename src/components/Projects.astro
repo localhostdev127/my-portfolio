@@ -1,0 +1,54 @@
+---
+import { Image } from "astro:assets";
+
+interface Project {
+  title: string;
+  description: string;
+  tech: string[];
+  image: string;
+}
+
+const projects: Project[] = [
+  {
+    title: "E-commerce Platform",
+    description: "A full-featured online store with cart and payment integration",
+    tech: ["React", "Node.js", "MongoDB"],
+    image: "/projects/ecommerce.jpg"
+  },
+  {
+    title: "Task Management App",
+    description: "Collaborative task management tool for teams",
+    tech: ["Vue.js", "Express", "PostgreSQL"],
+    image: "/projects/tasks.jpg"
+  },
+  {
+    title: "Weather Dashboard",
+    description: "Real-time weather information with interactive maps",
+    tech: ["React", "OpenWeather API", "Leaflet"],
+    image: "/projects/weather.jpg"
+  }
+];
+---
+<section id="projects" class="py-20 bg-gray-900/90  ">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-12 text-gray-200">Featured Projects</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {projects.map(project => (
+        <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden">
+          <div class="h-48 bg-gray-300">
+            <img class="object-fill h-48 w-full" src="/demo.jpg"/>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl text-gray-200 font-semibold mb-2">{project.title}</h3>
+            <p class="text-gray-300 mb-4">{project.description}</p>
+            <div class="flex flex-wrap gap-2">
+              {project.tech.map(tech => (
+                <span class="px-3 py-1 bg-blue-600 text-sm text-gray-50 rounded-full">{tech}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
