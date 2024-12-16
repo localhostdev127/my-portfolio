@@ -47,7 +47,7 @@ pipeline {
 
         stage('Docker: Build Docker Image') {
             steps {
-                sh "docker build --build-arg API_KEY=${params.APP_DOCKER_TAG_NAME} -t ${DOCKER_USER_NAME}/${PROJECT_NAME}:${params.APP_DOCKER_TAG_NAME} ."
+                sh "docker build -t ${DOCKER_USER_NAME}/${PROJECT_NAME}:${DOCKER_TAG_NAME} ."
             }
         }
 
