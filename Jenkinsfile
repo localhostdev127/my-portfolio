@@ -11,7 +11,7 @@ pipeline {
         DOCKER_USER_NAME = "jamirul"
         DOCKER_TAG_NAME="latest"
         GITHUB_URL='https://github.com/localhostdev127/my-portfolio.git'
-        SSH_CREDENTIALS_ID = 'portfolio-ssh-credentials'
+        SSH_CREDENTIALS_ID = 'remote-ssh-credentials'
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
     }
     
