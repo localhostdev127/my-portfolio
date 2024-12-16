@@ -119,7 +119,7 @@ pipeline {
                             docker pull "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
 
                             # Run the Docker container
-                            docker run -d -p 80:80 --name "$PROJECT_NAME" "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
+                            docker run -p 80:80 -d "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
                         '''
                     }
                 }
