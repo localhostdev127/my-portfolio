@@ -59,7 +59,7 @@ pipeline {
                         echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
                     '''
                 }
-                sh "docker push ${DOCKER_USER_NAME}/${PROJECT_NAME}:${params.APP_DOCKER_TAG_NAME}"
+                sh "docker push ${DOCKER_USER_NAME}/${PROJECT_NAME}:${DOCKER_TAG_NAME}"
             }
         }
 
