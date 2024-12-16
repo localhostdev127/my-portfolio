@@ -30,7 +30,7 @@ pipeline {
         
         stage('Clone Repository') {
             steps {
-                git branch: 'master', url:GITHUB_URL , credentialsId: 'github-credentials' 
+                git branch: 'main', url:GITHUB_URL , credentialsId: 'github-credentials' 
             }
         }
 
