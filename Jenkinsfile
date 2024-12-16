@@ -114,13 +114,15 @@ pipeline {
                             docker images -q | xargs -r docker rmi -f
 
                             # Login to Docker Hub
-                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                            #echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                            echo usernae "$DOCKER_USER"
+                            echo "$DOCKER_USER_NAME"
 
                             # Pull the latest Docker image
-                            docker pull "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
+                            #docker pull "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
 
                             # Run the Docker container
-                            docker run -p 80:80 -d "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
+                            #docker run -p 80:80 -d "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
                         '''
                     }
                 }
