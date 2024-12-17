@@ -77,7 +77,7 @@ pipeline {
             steps {
                 script {
                     sshagent (credentials: [env.SSH_CREDENTIALS_ID]) {
-                        withCredentials([string(credentialsId: env.DOCKER_CREDENTIALS_ID, variable: 'DOCKERHUB_PASS')]) {
+                        withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS_ID, passwordVariable: 'DOCKERHUB_PASS',usernameVariable: 'DOCKER_USERNAME')]) {
                             try {
                                 sh """
                                 ssh -o StrictHostKeyChecking=no $REMOTE_HOST << 'EOF'
