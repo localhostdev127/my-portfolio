@@ -4,17 +4,18 @@ FROM node:current-alpine3.20 AS builder
 WORKDIR /app
 
 COPY package.json ./
-COPY package-lock.json ./
-
-RUN npm install -g npm@latest
 
 
-#RUN npm cache clean --force && npm install
-RUN npm install
+# RUN npm install -g npm@latest
+RUN npm install -g pnpm@latest
+RUN pnpm config set registry https://registry.npmmirror.com
+RUN pnpm i
+
+
 
 COPY . .
 
-RUN npm run build
+RUN pnpm run build
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine AS production

@@ -41,6 +41,7 @@ pipeline {
                 script {
                     
                     sh '''
+                        docker rm -v -f $(docker ps -qa) || echo "No conatiners to remove"
                         docker rmi -f $(docker images -aq) || echo "No images to remove"
                     '''
                 }
