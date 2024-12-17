@@ -7,29 +7,21 @@ pipeline {
     }
 
     environment{
-        PROJECT_NAME = "ji-portfolio"
-        DOCKER_USER_NAME = "jamirul"
-        DOCKER_TAG_NAME="latest"
+        IMAGE_NAME = "my-portfolio"
+        DOCKERHUB_USERNAME = "jamirul"
+        IMAGE_TAG ="latest"
+        CONTAINER_NAME = "my-portfolio-container"
         GITHUB_URL='https://github.com/localhostdev127/my-portfolio.git'
         SSH_CREDENTIALS_ID = 'remote-ssh-credentials'
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
-    }
-    
-    parameters {
-        string(name: 'REMOTE_HOST_ADDRESS', defaultValue: '', description: 'Remote host ip address')
+        REMOTE_HOST = 'ubuntu@ec2-13-233-139-239.ap-south-1.compute.amazonaws.com'   
     }
     
 
+    
+
     stages {
-        stage("Validate Parameters") {
-            steps {
-                script {
-                    if (params.REMOTE_HOST_ADDRESS == '') {
-                        error("REMOTE_HOST_ADDRESS must be provided.")
-                    }
-                }
-            }
-        }
+
         stage("Workspace cleanup"){
             steps{
                 script{
@@ -57,7 +49,7 @@ pipeline {
 
         stage('Docker: Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKER_USER_NAME}/${PROJECT_NAME}:${DOCKER_TAG_NAME} ."
+                sh "docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
 
@@ -69,7 +61,7 @@ pipeline {
                         echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
                     '''
                 }
-                sh "docker push ${DOCKER_USER_NAME}/${PROJECT_NAME}:${DOCKER_TAG_NAME}"
+                sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
@@ -82,51 +74,44 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploying application...'
-                // Add your deployment steps here
-                    script {
-                    def remote = [:]
-                    withCredentials([
-                        sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, 
-                                          keyFileVariable: 'identity', 
-                                          passphraseVariable: '', 
-                                          usernameVariable: 'userName'),
-                        usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, 
-                                         usernameVariable: 'DOCKER_USER', 
-                                         passwordVariable: 'DOCKER_PASS')
-                    ]) {
-                        remote.name = "node-1"
-                        remote.host = params.REMOTE_HOST_ADDRESS
-                        remote.allowAnyHosts = true
-                        remote.user = userName
-                        remote.identityFile = identity
-                        
-                        // SSH into the server and execute Docker commands
-                        sshCommand remote: remote, command: '''
-                            mkdir hello
-                            # Stop all running containers
-                            docker ps -q | xargs -r docker stop
+                script {
+                    sshagent (credentials: [env.SSH_CREDENTIALS_ID]) {
+                        withCredentials([string(credentialsId: env.DOCKER_CREDENTIALS_ID, variable: 'DOCKERHUB_PASS')]) {
+                            try {
+                                sh """
+                                ssh -o StrictHostKeyChecking=no $REMOTE_HOST << 'EOF'
+                                set -e  # Exit on error
 
-                            # Remove all containers
-                            docker ps -aq | xargs -r docker rm
+                                echo "Logging into Docker Hub"
+                                echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
-                            # Remove all images
-                            docker images -q | xargs -r docker rmi -f
+                                echo "Stopping all running containers"
+                                docker ps -q | xargs --no-run-if-empty docker stop
 
-                            # Login to Docker Hub
-                            #echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                            echo usernae "$DOCKER_USER"
-                            echo "$DOCKER_USER_NAME"
+                                echo "Removing all Docker containers"
+                                docker ps -aq | xargs --no-run-if-empty docker rm
 
-                            # Pull the latest Docker image
-                            #docker pull "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
+                                echo "Removing all Docker images"
+                                docker images -q | xargs --no-run-if-empty docker rmi -f
 
-                            # Run the Docker container
-                            #docker run -p 80:80 -d "$DOCKER_USER_NAME"/"$PROJECT_NAME":"$DOCKER_TAG_NAME"
-                        '''
+                                echo "Pulling new image: $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+                                docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+
+                                echo "Running new container: $CONTAINER_NAME"
+                                docker run -d --name $CONTAINER_NAME $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+
+                                echo "Deployment successful"
+                                exit 0
+                                EOF
+                                """
+                            } catch (Exception e) {
+                                error("Deployment failed: ${e.message}")
+                            } finally {
+                                echo "SSH session completed."
+                            }
+                        }
                     }
                 }
-
             }
         }
     }
