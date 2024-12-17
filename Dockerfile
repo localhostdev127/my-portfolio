@@ -3,13 +3,14 @@ FROM node:current-alpine3.21 AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json ./
+COPY package-lock.json ./
 
 RUN npm install -g npm@latest
 
 
-RUN npm cache clean --force && npm install
-#RUN npm install
+#RUN npm cache clean --force && npm install
+RUN npm install
 
 COPY . .
 
