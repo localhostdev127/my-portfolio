@@ -99,7 +99,7 @@ pipeline {
                                 docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
                                 echo "Running new container: $CONTAINER_NAME"
-                                docker run -d --name $CONTAINER_NAME $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+                                docker run -p 80:80 -d --name $CONTAINER_NAME $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
                                 echo "Deployment successful"
                                 exit 0
