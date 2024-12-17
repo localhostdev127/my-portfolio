@@ -1,5 +1,5 @@
 # Stage 1: Build the Astro app
-FROM node:current-alpine3.21 AS builder
+FROM node:current-alpine3.20 AS builder
 
 WORKDIR /app
 
