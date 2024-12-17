@@ -81,7 +81,6 @@ pipeline {
                             try {
                                 sh """
                                 ssh -o StrictHostKeyChecking=no $REMOTE_HOST << 'EOF'
-                                set -e  # Exit on error
 
                                 echo "Logging into Docker Hub"
                                 echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
